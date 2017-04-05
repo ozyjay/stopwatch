@@ -53,17 +53,20 @@ def onButtonClick():
         
 
 startPos = [0,0]
-def onStartMove(event):
+def onLeftMouseButtonPress(event):
     global startPos
     startPos[0] = event.x
     startPos[1] = event.y
 
-def onTkMove(event):
+def onLeftMouseButtonMove(event):
     global root, startPos
     print(root.winfo_x(), root.winfo_y())
     x = root.winfo_x() + event.x - startPos[0]
     y = root.winfo_y() + event.y - startPos[1]
     root.geometry('+%d+%d' % (x,y))
+
+def onRightMouseButtonPress(event):
+    root.destroy()
 
 display = Label(root, text=str(time), font=('Consolas', 24))
 display.pack()
@@ -75,7 +78,7 @@ root.resizable(0,0)
 
 root.attributes("-toolwindow",True)
 root.overrideredirect(True)
-root.bind("<Button-3>", lambda event: root.destroy())
-root.bind("<Button-1>", onStartMove)
-root.bind("<B1-Motion>", onTkMove)
+root.bind("<ButtonRelease-3>", onRightMouseButtonPress)
+root.bind("<ButtonPress-1>", onLeftMouseButtonPress)
+root.bind("<B1-Motion>", onLeftMouseButtonMove)
 root.mainloop()
