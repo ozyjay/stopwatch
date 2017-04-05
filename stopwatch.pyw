@@ -36,7 +36,7 @@ def tick():
         display.after(1000, tick)
         time.tick()
 
-def handler():
+def onButtonClick():
     global state, display, button
     if state == "IDLE":
         state = "RUNNING"
@@ -52,12 +52,30 @@ def handler():
         button['text'] = "start"
         
 
+startPos = [0,0]
+def onStartMove(event):
+    global startPos
+    startPos[0] = event.x
+    startPos[1] = event.y
+
+def onTkMove(event):
+    global root, startPos
+    print(root.winfo_x(), root.winfo_y())
+    x = root.winfo_x() + event.x - startPos[0]
+    y = root.winfo_y() + event.y - startPos[1]
+    root.geometry('+%d+%d' % (x,y))
+
 display = Label(root, text=str(time), font=('Consolas', 24))
 display.pack()
 
-button = Button(root, text="start", command=handler)
+button = Button(root, text="start", command=onButtonClick)
 button.pack()
 
 root.resizable(0,0)
 
+root.attributes("-toolwindow",True)
+root.overrideredirect(True)
+root.bind("<Button-3>", lambda event: root.destroy())
+root.bind("<Button-1>", onStartMove)
+root.bind("<B1-Motion>", onTkMove)
 root.mainloop()
