@@ -1,9 +1,5 @@
 from tkinter import *
 
-root = Tk()
-
-state = "IDLE"
-
 class Time:
     def __init__(self):
         self.reset()
@@ -28,7 +24,7 @@ class Time:
                                        time.secs)
 
 time = Time()
-
+state = "IDLE"
 def tick():
     global time, state
     if state == "RUNNING":
@@ -36,20 +32,17 @@ def tick():
         display.after(1000, tick)
         time.tick()
 
-def onButtonClick():
-    global state, display, button
+def updateTimerState():
+    global state, display
     if state == "IDLE":
         state = "RUNNING"
-        button['text'] = "stop"
         tick()
     elif state == "RUNNING":
         state = "STOPPED"
-        button['text'] = "stopped"
     elif state == "STOPPED":
         state = "IDLE"
         time.reset()
         display['text'] = str(time)
-        button['text'] = "start"
         
 
 startPos = [0,0]
@@ -60,25 +53,27 @@ def onLeftMouseButtonPress(event):
 
 def onLeftMouseButtonMove(event):
     global root, startPos
-    print(root.winfo_x(), root.winfo_y())
     x = root.winfo_x() + event.x - startPos[0]
     y = root.winfo_y() + event.y - startPos[1]
     root.geometry('+%d+%d' % (x,y))
 
-def onRightMouseButtonPress(event):
+def onLeftMouseButtonRelease(event):
+    global startPos
+    if event.x == startPos[0] and event.y == startPos[1]:
+        updateTimerState()
+
+def onRightMouseButtonRelease(event):
     root.destroy()
 
+root = Tk()
 display = Label(root, text=str(time), font=('Consolas', 24))
 display.pack()
 
-button = Button(root, text="start", command=onButtonClick)
-button.pack()
-
 root.resizable(0,0)
-
 root.attributes("-toolwindow",True)
 root.overrideredirect(True)
-root.bind("<ButtonRelease-3>", onRightMouseButtonPress)
+root.bind("<ButtonRelease-3>", onRightMouseButtonRelease)
 root.bind("<ButtonPress-1>", onLeftMouseButtonPress)
 root.bind("<B1-Motion>", onLeftMouseButtonMove)
+root.bind("<ButtonRelease-1>", onLeftMouseButtonRelease)
 root.mainloop()
